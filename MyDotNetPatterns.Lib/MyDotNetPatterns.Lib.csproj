@@ -48,6 +48,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -56,9 +57,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CachingPattern\BLL\AddressTypes\AddressType.cs" />
+    <Compile Include="CachingPattern\BLL\AddressTypes\AddressTypeFactory.cs" />
+    <Compile Include="CachingPattern\Core\InMemoryCache.cs" />
+    <Compile Include="CachingPattern\DAL\AddressTypes\AddressTypeDTO.cs" />
+    <Compile Include="CachingPattern\DAL\AddressTypes\AdressTypeDAI.cs" />
     <Compile Include="DALPattern\Core\DALFunctions.cs" />
-    <Compile Include="DALPattern\Employees\EmployeeDAI.cs" />
-    <Compile Include="DALPattern\Employees\EmployeeDTO.cs" />
+    <Compile Include="DALPattern\Core\DataStoreFieldAttribute.cs" />
+    <Compile Include="DALPattern\Core\Hydrator.cs" />
+    <Compile Include="DALPattern\People\PersonDAI.cs" />
+    <Compile Include="DALPattern\People\PersonDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +81,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

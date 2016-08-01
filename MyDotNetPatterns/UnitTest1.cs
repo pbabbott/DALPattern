@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MyDotNetPatterns.Lib.DALPattern.Employees;
+using MyDotNetPatterns.Lib.DALPattern.People;
 using System.Configuration;
 using System.Linq;
 
@@ -12,9 +12,8 @@ namespace MyDotNetPatterns
         public void TestMethod1()
         {
             
-            var employees = EmployeeDAI.GetEmployees();
-
-            Assert.IsTrue(employees.Any());
+            var people = PersonDAI.GetPeople();
+            Assert.IsTrue(people.Any());
         }
     }
 }

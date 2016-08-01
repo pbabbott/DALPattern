@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 
 namespace MyDotNetPatterns.Lib.DALPattern.Core
@@ -10,21 +12,21 @@ namespace MyDotNetPatterns.Lib.DALPattern.Core
 
         private const int _CommandTimeOut = 600;
 
+        private DbProviderFactory _DbProviderFactory { get; set; }
+
         public DALFunctions(string connectionString)
         {
             this._ConnectionString = connectionString;
+            this._DbProviderFactory = DbProviderFactories.GetFactory("System.Data.SqlClient");
         }
 
         #region Private Methods
 
-        private SqlConnection GetSqlConnection(bool open = true)
+        private SqlConnection GetSqlConnection()
         {
-            SqlConnection result = new SqlConnection(_ConnectionString);
-            if (open)
-            {
-                result.Open();
-            }
-            return result;
+            SqlConnection connection = (SqlConnection)this._DbProviderFactory.CreateConnection();
+            connection.ConnectionString = _ConnectionString;
+            return connection;
         }
 
         private SqlCommand GetSqlCommand(SqlConnection connection, CommandType commandType, string commandText)
@@ -66,6 +68,32 @@ namespace MyDotNetPatterns.Lib.DALPattern.Core
         #endregion Private Methods
 
         #region Public Methods
+
+        public DataTable GetSchemaFromTableName(string sqlTableName)
+        {
+            using (SqlConnection connection = GetSqlConnection())
+            {
+                string[] restrictions = new string[4]
+                {
+                    null,
+                    null,
+                    sqlTableName,
+                    null
+                };
+
+                DataTable schemaTable = connection.GetSchema("Columns", restrictions);
+                DataTable result = new DataTable();
+                foreach (DataRow dr in schemaTable.AsEnumerable())
+                {
+                    string columnName = dr.Field<string>("Column_Name");
+                    string sqlType = dr.Field<string>("Data_Type");
+
+                    result.Columns.Add(new DataColumn(columnName, TransformType(sqlType)));
+                }
+
+                return result;
+            }
+        }
 
         public DataSet ExecuteSprocReturnDS(string storedProcedure, Dictionary<string, object> parameters = null)
         {
@@ -164,5 +192,41 @@ namespace MyDotNetPatterns.Lib.DALPattern.Core
         }
 
         #endregion Public Methods
+
+        #region Static
+
+        private static Type TransformType(string sqlTypeName)
+        {
+            switch (sqlTypeName.ToLower())
+            {
+                case "int":
+                case "smallint":
+                case "tinyint":
+                    return typeof(int);
+
+                case "varchar":
+                    return typeof(string);
+
+                case "bit":
+                    return typeof(bool);
+
+                case "date":
+                case "datetime":
+                    return typeof(DateTime);
+
+                case "uniqueidentifier":
+                    return typeof(Guid);
+
+                case "decimal":
+                case "money":
+                case "float":
+                    return typeof(decimal);
+
+                default:
+                    throw new Exception(String.Format("Unknown SQL type '{0}' encountered. Please add to this switch/case", sqlTypeName));
+            }
+        }
+
+        #endregion Static
     }
 }
